@@ -5,6 +5,7 @@ interface PageWrapperProps {
   children: React.ReactNode;
 }
 
+// TODO: not really a page wrapper more like a content wrapper at this point, will want to change this
 const PageWrapper: React.FC<PageWrapperProps> = ({ children }) => {
   return (
     <Box
