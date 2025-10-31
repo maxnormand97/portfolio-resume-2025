@@ -12,6 +12,49 @@ const About: React.FC = () => {
     setNavValue(newValue);
   };
 
+  // https://hype4.academy/tools/glassmorphism-generator
+  // https://heropatterns.com/
+  // https://www.shapedivider.app/
+  // https://colorhunt.co/palette/000957344cb7577bc1ffeb00
+  // https://www.happyhues.co/palettes/6
+  // https://mycolor.space/gradient
+
+  // Example of wave...
+  // const ShapeDivider = () => {
+  //   return (
+  //     <div
+  //       style={{
+  //         position: 'absolute',
+  //         top: 0,
+  //         left: 0,
+  //         width: '100%',
+  //         overflow: 'hidden',
+  //         lineHeight: 0
+  //       }}
+  //     >
+  //       <svg
+  //         data-name="Layer 1"
+  //         xmlns="http://www.w3.org/2000/svg"
+  //         viewBox="0 0 1200 120"
+  //         preserveAspectRatio="none"
+  //         style={{
+  //           position: 'relative',
+  //           display: 'block',
+  //           width: 'calc(111% + 1.3px)',
+  //           height: '118px',
+  //         }}
+  //       >
+  //         <path
+  //           d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+  //           style={{
+  //             fill: '#FF3FF6',
+  //           }}
+  //         ></path>
+  //       </svg>
+  //     </div>
+  //   );
+  // };
+
   return (
     <>
     {/* TODO: more of a component than a wrapper need to fix this... */}
@@ -40,6 +83,7 @@ const About: React.FC = () => {
 
         <Paper elevation={3} sx={{ padding: 3, margin: 2 }}>
           <h1>Thats had a big Journey</h1>
+          {/* TODO: this is better off being a vertical stepper, it will be more visually appealing */}
           <ExperienceStepper />
           {/* TODO: reward the user when they finish, thanks have a cookie! */}
           {/* Experience */}
@@ -88,6 +132,7 @@ const About: React.FC = () => {
 
         {/* Dealt with a bunch of bugs */}
         {/* TODO: here do a mini minesweeper game */}
+        {/* TODO: also add a color palette theme changer thingy, that hovers on the right hand side */}
 
         {/* And had some fun along the way... */}
 

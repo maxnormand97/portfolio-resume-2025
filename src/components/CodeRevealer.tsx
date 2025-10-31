@@ -44,6 +44,11 @@ export default function CodeRevealer() {
     setExpanded((prev) => (prev === language ? null : language));
   };
 
+  // TODO: instead of this make a container that has draggable elements where the user
+  // can drag each skill into one another which grows. So a bunch of mini circles
+  // that grow into a larger circle. Each time it upgrades with an emoji or something
+  // to represent the skill level increasing. Have a reset button at some point.
+
   return (
     <Box sx={{ width: '100%', p: 4 }}>
       <Stack spacing={2}>
