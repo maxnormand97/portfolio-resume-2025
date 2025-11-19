@@ -1,77 +1,171 @@
 import React, { useState } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  type DragEndEvent,
+  type DragOverEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
+import { css, keyframes } from '@emotion/react';
 
-// TODO: POC clean up later with custom styling ect
 const languages = [
-  { 
-    name: 'JavaScript', 
-    details: 'JavaScript is a versatile language used for web development, both on the client and server side.' 
-  },
-  { 
-    name: 'Python', 
-    details: 'Python is known for its simplicity and is widely used in data science, AI, and backend development.' 
-  },
-  { 
-    name: 'Java', 
-    details: 'Java is a robust, object-oriented language commonly used for enterprise applications and Android development.' 
-  },
-  { 
-    name: 'C++', 
-    details: 'C++ is a high-performance language often used in system programming, game development, and embedded systems.' 
-  },
-  { 
-    name: 'TypeScript', 
-    details: 'TypeScript is a superset of JavaScript that adds static typing, making it ideal for large-scale applications.' 
-  },
-  { 
-    name: 'Go', 
-    details: 'Go is a modern language designed for scalability and efficiency, often used in cloud and backend systems.' 
-  },
-  { 
-    name: 'Ruby', 
-    details: 'Ruby is a dynamic language known for its simplicity and is popular in web development with Ruby on Rails.' 
-  },
+  { id: '1', name: 'JavaScript' },
+  { id: '2', name: 'Python' },
+  { id: '3', name: 'Java' },
+  { id: '4', name: 'C++' },
+  { id: '5', name: 'TypeScript' },
+  { id: '6', name: 'Go' },
+  { id: '7', name: 'Ruby' },
 ];
 
+// TODO:
+// 1. Make them floating so they don't sort through each other
 export default function CodeRevealer() {
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [items, setItems] = useState(languages);
+  const [combiningId, setCombiningId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null); // Track the current "over" item
 
-  const handleToggle = (language: string) => {
-    setExpanded((prev) => (prev === language ? null : language));
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { over } = event;
+    setOverId(over?.id ? String(over.id) : null); // Update the "over" state
   };
 
-  // TODO: instead of this make a container that has draggable elements where the user
-  // can drag each skill into one another which grows. So a bunch of mini circles
-  // that grow into a larger circle. Each time it upgrades with an emoji or something
-  // to represent the skill level increasing. Have a reset button at some point.
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    setOverId(null); // Reset the "over" state
+
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      setCombiningId(String(over.id)); // Set the combining state to the target item's ID
+
+      setTimeout(() => {
+        setItems((prev) => {
+          const activeIndex = prev.findIndex((item) => item.id === active.id);
+          const overIndex = prev.findIndex((item) => item.id === over.id);
+
+          // Combine items if dropped on another item
+          if (overIndex !== -1) {
+            const combinedItem = {
+              id: `${prev[overIndex].id}-${prev[activeIndex].id}`,
+              name: `${prev[overIndex].name} + ${prev[activeIndex].name}`,
+            };
+
+            const newItems = prev.filter(
+              (_, index) => index !== activeIndex && index !== overIndex
+            );
+
+            newItems.splice(overIndex, 0, combinedItem);
+            return newItems;
+          }
+
+          // Otherwise, reorder items
+          return arrayMove(prev, activeIndex, overIndex);
+        });
+
+        setCombiningId(null); // Reset the combining state after the animation
+      }, 300); // Match the duration of the CSS animation
+    }
+  };
 
   return (
-    <Box sx={{ width: '100%', p: 4 }}>
-      <Stack spacing={2}>
-        {languages.map((language) => (
-          <Box key={language.name}>
-            <Chip
-              label={language.name}
-              onClick={() => handleToggle(language.name)}
-              sx={{
-                cursor: 'pointer',
-                bgcolor: expanded === language.name ? 'primary.main' : 'grey.300',
-                color: expanded === language.name ? 'white' : 'black',
-                '&:hover': { bgcolor: 'primary.light', color: 'white' },
-              }}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragOver={handleDragOver} // Handle drag over events
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={items.map((item) => item.id)}>
+        <Box sx={{ width: '100%', p: 4 }}>
+          {items.map((item) => (
+            <SortableItem
+              key={item.id}
+              id={item.id}
+              name={item.name}
+              isCombining={combiningId === item.id}
+              isOver={overId === item.id} // Pass the "over" state
             />
-            <Collapse in={expanded === language.name}>
-              <Box sx={{ mt: 1, p: 2, bgcolor: 'grey.100', borderRadius: 2 }}>
-                <Typography>{language.details}</Typography>
-              </Box>
-            </Collapse>
-          </Box>
-        ))}
-      </Stack>
+          ))}
+        </Box>
+      </SortableContext>
+    </DndContext>
+  );
+}
+
+function SortableItem({
+  id,
+  name,
+  isCombining,
+  isOver,
+}: {
+  id: string;
+  name: string;
+  isCombining: boolean;
+  isOver: boolean;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id,
+  });
+
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    transition,
+  };
+
+  const combiningAnimation = keyframes`
+    0% { transform: scale(1); background-color: #e0e0e0; }
+    50% { transform: scale(1.1); background-color: #ffcc80; }
+    100% { transform: scale(1); background-color: #e0e0e0; }
+  `;
+
+  const combiningStyle = isCombining
+    ? css`
+        animation: ${combiningAnimation} 0.3s ease-in-out;
+      `
+    : undefined;
+
+    const overStyle = isOver
+    ? {
+        backgroundColor: '#ffc0cb', // Use backgroundColor instead of bgcolor
+      }
+    : {};
+
+  return (
+    <Box
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      sx={{
+        ...style,
+        ...combiningStyle,
+        ...overStyle,
+        p: 2,
+        mb: 2,
+        backgroundColor: 'grey.300',
+        borderRadius: 2,
+        cursor: 'grab',
+        boxShadow: 1,
+      }}
+    >
+      <Typography>{name}</Typography>
     </Box>
   );
 }

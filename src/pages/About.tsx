@@ -12,6 +12,9 @@ const About: React.FC = () => {
     setNavValue(newValue);
   };
 
+  // Use this for deployments its free and also provides a free DNS with subdomain
+  // https://vercel.com/
+
   // https://hype4.academy/tools/glassmorphism-generator
   // https://heropatterns.com/
   // https://www.shapedivider.app/
@@ -77,6 +80,15 @@ const About: React.FC = () => {
                 {/* Scrum Master */}
                 {/* Interesting in Cyber sec pursuing my CompTia Security + */}
                 {/* Also a 3D Artist / Designer */}
+                {/* TODO: in both this and your resume focus on your highest / proudest achievements */}
+                {/* built features that won awards and earned big bucks */}
+                {/* developed cutting edge AI / MCP tool features that increased long flows of a complex application and brought in more customers and revenue*/}
+                {/* successfully Scrum Mastered a team of 9 engineers */}
+                {/* improved the performance of critical pages and flow resulting in not loosing customers and keeping many happy */}
+                {/* helped lead projects to improve CI and development pipelines resulting in faster delivering */}
+                {/* gave lectures and taught junior devs on code coding and testing practices. */}
+                {/* Completely self taught riding through on pure grit, enthusiasm and interest (I do love it and I never stop learning) */}
+                {/* Successfully taught and mentored team mates with little to know programming and web knowledge on full stack development and programming */}
             </Typography>
           </Box>
         </Paper>
@@ -138,7 +150,7 @@ const About: React.FC = () => {
 
         {/* Interests / Loves */}
           {/* Surfing / nature (nowadays AKA trying not to drown) */}
-          {/* Sci Fi, Philosophy, History (I love reading, Aliens and reminding myself that I will indeed die one day better get livin) */}
+          {/* Sci Fi, Philosophy, History (I love reading, Aliens and reminding myself that life is not permanent) */}
           {/* Cinema, Film, Games Entertainment (I studied 3D Animation originally in another life) */}
           {/* Learning anything really */}
           {/* talking to humans when I'm not in a fugue state from a bug */}
