@@ -12,6 +12,10 @@ const About: React.FC = () => {
     setNavValue(newValue);
   };
 
+  // TODO / IDEA: make every section a game, each game if you win you unlock a prize.
+  // Have a component with boxes or something that https://types.kitlangton.com/ at the top
+  // each time a game is one we unlock one of those boxes. We can use redux or something to manage this
+
   // Use this for deployments its free and also provides a free DNS with subdomain
   // https://vercel.com/
 
@@ -21,6 +25,12 @@ const About: React.FC = () => {
   // https://colorhunt.co/palette/000957344cb7577bc1ffeb00
   // https://www.happyhues.co/palettes/6
   // https://mycolor.space/gradient
+
+  // Animations
+  // https://react.dev/reference/react/ViewTransition#animating-an-element-on-enter
+
+  // REF for coding exp
+  // https://infinitecraftnew.com/
 
   // Example of wave...
   // const ShapeDivider = () => {
