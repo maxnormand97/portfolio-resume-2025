@@ -1,38 +1,6 @@
 import { useState } from 'react';
 import Tile from '../components/bug-sweeper/Tile'
 
-  // TODO:
-  // This will be like a mini minesweeper game but for bugs. The user will see something like the old minesweeper windows
-  // game from the 2000s. There will be a bunch of tiles (we can make it configurable later) and within each tile there
-  // may or may not be a bug. Use the rules from the classic minesweeper game for this.
-
-  // https://minesweeper.online/game/5311546343
-
-  // Rules are as follows (according to AI)
-
-    // The game board is a grid of covered cells, some containing mines.
-    // The player clicks cells to reveal them.
-    // If a mine is revealed, the game ends (loss).
-    // If a cell without a mine is revealed, it shows a number indicating how many adjacent cells contain mines (0–8).
-    // Revealing a cell with zero adjacent mines automatically reveals all adjacent cells recursively.
-    // The player can flag cells suspected to contain mines.
-    // The game is won when all non-mine cells are revealed.
-    // The player loses if a mine is revealed.
-
-  // 1. we need to generate a function that creates a bunch of divs that look like tiles, the div is probably better to be
-  // its own component.
-
-  // 2. It makes sense for the tile to contain a state, if its a bug or not, if it has been clicked or not (active - inactive) we
-  // should add this as props to the Tile. We could also have a tile interface as well
-
-  // 3. If any bug is hit all of the tiles states should be set to is active and the game should be over set to loose. We will need
-  // to handle a state for the game as well, pending, in progress, win or loose, based on this state we can do different things
-  // later
-
-  // 4. we when a non bug tile is clicked we need to know if there might be a bug nearby
-  // we need a new attribute for the tile interface that has number of possible bugs nearby the limit can be set to 3
-  // or rank in colors instead of 1,2,3 based on the approximation of bugs near the tile.
-
 interface BoardTile {
   isBug: boolean;
   isActive: boolean;
@@ -110,7 +78,7 @@ export default function BugSweeper() {
   const rows = 5;
   const cols = 5;
   // TODO: on the bug count we can set it to different values the higher it is the more difficult the game
-  const bugCount = 5;
+  const bugCount = 1;
 
   const [board, setBoard] = useState(() => createBoard(rows, cols, bugCount));
   const [gameState, setGameState] = useState<GameState>('pending');
@@ -118,28 +86,32 @@ export default function BugSweeper() {
 
   function handleTileClick(row: number, col: number) {
     if (gameState === 'lose' || gameState === 'win') return;
-
     if (gameState === 'pending') setGameState('inProgress');
 
     const tile = board[row][col];
     if (tile.isBug) {
-      // Reveal all tiles and set game to lose
       setBoard(prev =>
         prev.map(rowArr =>
           rowArr.map(tile => ({ ...tile, isActive: true }))
         )
       );
       setGameState('lose');
-    } else {
-      setBoard(prev =>
-        prev.map((rowArr, r) =>
-          rowArr.map((tile, c) =>
-            r === row && c === col ? { ...tile, isActive: true } : tile
-          )
-        )
-      );
-      // Win check can be added later
+      return;
     }
+
+    // Reveal the clicked tile
+    const newBoard = board.map((rowArr, rIdx) =>
+      rowArr.map((tile, cIdx) =>
+        rIdx === row && cIdx === col ? { ...tile, isActive: true } : tile
+      )
+    );
+    setBoard(newBoard);
+
+    // Check win condition: all non-bug tiles are active
+    const allNonBugsActive = newBoard.flat().every(tile =>
+      tile.isBug || tile.isActive
+    );
+    if (allNonBugsActive) setGameState('win');
   }
 
   // Create the game with tiles and tile props already set
@@ -171,11 +143,20 @@ export default function BugSweeper() {
 
   return (
     <div style={{ width: cols * 36 }}>
-      {generateTiles(board)}
-      <div>
-        Game State: {gameState}
-      </div>
-      <button onClick={resetGame}>Reset Game</button>
+      {gameState === 'win' ? (
+        <div>
+          <h2>You Win! 🎉</h2>
+          <button onClick={resetGame}>Reset Game</button>
+        </div>
+      ) : (
+        <>
+          {generateTiles(board)}
+          <div>
+            Game State: {gameState}
+          </div>
+          <button onClick={resetGame}>Reset Game</button>
+        </>
+      )}
     </div>
   );
 };
